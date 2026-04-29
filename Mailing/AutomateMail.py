@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from GetToken import get_token
 import os
 
-# vars = dotenv.dotenv_values(r"C:\Users\aaitmoussa\Desktop\Projet Aplitec\Automation\.env")
+vars = dotenv.dotenv_values(r"C:\Users\aaitmoussa\Desktop\Projet Aplitec\Automation\.env")
 
 
 def extract_otp_from_html(body: str) -> str | None:
@@ -38,7 +38,7 @@ def fetch_otp_from_outlook(
     poll_interval: int = 5
 ) -> str:
     
-    mailbox = os.environ["SHARED_MAILBOX"]
+    mailbox = vars["SHARED_MAILBOX"]
     start_datetime = (datetime.utcnow() - timedelta(minutes=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
     
     url = (

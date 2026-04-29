@@ -6,7 +6,7 @@ import dotenv
 import requests
 import os
 
-# vars = dotenv.dotenv_values(r"C:\Users\aaitmoussa\Desktop\Projet Aplitec\Automation\.env")
+vars = dotenv.dotenv_values(r"C:\Users\aaitmoussa\Desktop\Projet Aplitec\Automation\.env")
 
 def create_folder(token: str, drive_id: str, parent_folder: str, folder_name: str) -> str:
     """Creates a subfolder inside parent_folder and returns its id"""
@@ -72,7 +72,7 @@ def upload_zip_to_sharepoint(zip_path: str, fund_name: str, dispo: str, au: str,
     
     # Build subfolder name from dates e.g. "01-04-2026_18-04-2026"
     subfolder_name = f"{fund_name}-{dispo.replace('/', '-')}_{au.replace('/', '-')}"
-    parent_folder = os.environ["SHAREPOINT_FOLDER"]  # test_automation_aplitec
+    parent_folder = vars["SHAREPOINT_FOLDER"]  # test_automation_aplitec
     full_folder_path = f"{parent_folder}/{subfolder_name}"
 
     # Create the subfolder on SharePoint
@@ -100,7 +100,7 @@ def upload_single_pdf_to_sharepoint(pdf_path, fund_name: str, dispo: str, au: st
 
     safe_fund_name = fund_name.replace("/", "-").replace("\\", "-").replace(":", "-").replace("*", "-").replace("?", "-").replace('"', "-").replace("<", "-").replace(">", "-").replace("|", "-").strip()
     subfolder_name = f"{safe_fund_name}-{dispo.replace('/', '-')}_{au.replace('/', '-')}"
-    parent_folder = os.environ["SHAREPOINT_FOLDER"]
+    parent_folder = vars["SHAREPOINT_FOLDER"]
     full_folder_path = f"{parent_folder}/{subfolder_name}"
 
     create_folder(token, drive_id, parent_folder, subfolder_name)

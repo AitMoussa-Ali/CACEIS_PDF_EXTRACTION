@@ -7,7 +7,7 @@ import pandas as pd
 import io
 
 
-# vars = dotenv.dotenv_values(r"C:\Users\aaitmoussa\Desktop\Projet Aplitec\Automation\.env")
+vars = dotenv.dotenv_values(r"C:\Users\aaitmoussa\Desktop\Projet Aplitec\Automation\.env")
 
 def read_excel_from_sharepoint() -> pd.DataFrame:
     token = get_token()
@@ -15,9 +15,9 @@ def read_excel_from_sharepoint() -> pd.DataFrame:
     print('drive_id : ', drive_id)  # Debugging line to check if we got the drive ID correctly
     
     
-    file_path = os.environ["PATH_LOGIN_FILE"]
-    sheet_name = os.environ["SHEET_LOGIN_NAME"]
-    LOCAL_PATH = os.environ["LOCAL_PATH_LOGIN_FILE_SHEET"]
+    file_path = vars["PATH_LOGIN_FILE"]
+    sheet_name = vars["SHEET_LOGIN_NAME"]
+    LOCAL_PATH = vars["LOCAL_PATH_LOGIN_FILE_SHEET"]
     headers = {"Authorization": f"Bearer {token}"}
 
     # Download the file as bytes in memory

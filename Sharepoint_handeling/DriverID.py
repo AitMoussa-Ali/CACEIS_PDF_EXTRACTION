@@ -5,7 +5,7 @@ import os
 def get_drive_id(token: str) -> str:
     headers = {"Authorization": f"Bearer {token}"}
     
-    site_url = os.environ["SHAREPOINT_SITE_URL"]
+    site_url = vars["SHAREPOINT_SITE_URL"]
 
     site_response = requests.get(
         f"https://graph.microsoft.com/v1.0/sites/{site_url}",

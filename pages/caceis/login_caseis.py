@@ -1,7 +1,7 @@
 from playwright.sync_api import Page
-import dotenv
+# import dotenv
 from Mailing.AutomateMail import fetch_otp_from_outlook
-vars = dotenv.dotenv_values(r"C:\Users\aaitmoussa\Desktop\Projet Aplitec\Automation\.env")
+# vars = dotenv.dotenv_values(r"C:\Users\aaitmoussa\Desktop\Projet Aplitec\Automation\.env")
 
 class Login:
     def __init__(self, page: Page):
