@@ -12,9 +12,6 @@ class Login:
         self.otp_input = page.get_by_role("textbox", name="Entrer le code de sécurité ici")
         self.error_message = page.locator("#ols-error-login")
         self.menu = page.locator("[data-test='menu-entry-MENU']")
-    
-    # def get_URL(self):
-    #     return vars["URL_CACEIS"]
 
     def type_username(self, username):
         self.username_input.type(username)

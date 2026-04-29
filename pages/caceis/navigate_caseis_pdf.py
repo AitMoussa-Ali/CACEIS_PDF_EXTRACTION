@@ -1,3 +1,5 @@
+from dataclasses import field
+
 from playwright.sync_api import Page, TimeoutError as PlaywrightTimeout
 import time
 from Sharepoint_handeling.uploader import upload_single_pdf_to_sharepoint
@@ -33,6 +35,8 @@ class Navigate_PDF_Caceis:
         self.next_button = self.frame1.locator("#ext-gen215")
         
         self.logout = page.locator("li:nth-child(7) > .p-element")
+        
+        self.date_pattern = re.compile(r"^\d{2}/\d{2}/\d{4}$")  # pattern to extract dates from fund name
 
 # Function to select menu items with proper waiting
     def select_menu(self):
@@ -80,14 +84,15 @@ class Navigate_PDF_Caceis:
 
             # safer than click+type loop
             field.click()
+            field.wait_for(timeout=2000)  # small delay to ensure focus
             field.press("Control+A")
+            field.wait_for(timeout=2000)  # small delay to ensure selection
             field.press("Backspace")
-
+            field.wait_for(timeout=2000)  # small delay to ensure selection
             # optional safety check (rarely needed)
-            while field.input_value() != "":
-                field.fill("")
-
-            field.fill(value)
+            while not self.date_pattern.match(field.input_value()):
+                field.fill(value)
+            field.wait_for(timeout=2000)  # small delay to ensure selection
             field.press("Tab")
             
             
