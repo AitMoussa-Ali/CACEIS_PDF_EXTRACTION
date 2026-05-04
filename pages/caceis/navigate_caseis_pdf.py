@@ -183,7 +183,6 @@ class Navigate_PDF_Caceis:
         self.logout.wait_for(state="visible")
         self.logout.click()
 
-
 #------------------------------------------------------------------------------------------
 # Main function to perform the full navigation flow
     def full_navigate(self, text, dispo, au, fund_name):

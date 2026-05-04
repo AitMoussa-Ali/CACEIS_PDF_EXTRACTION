@@ -13,7 +13,12 @@ def run_extract_pdf(dispo="01/04/2026", au="18/04/2026") -> None:
     df = pd.read_excel(BASE_DIR / "Login_list_for_funds.xlsx", skiprows=1)
     df.columns = df.columns.str.replace(' ', '_')
 
-    caceis = df[(df['Banque_dépositaire'] == 'CACEIS') & (df['Email'] == "eric.belloche@groupe-aplitec.com")]
+    caceis = df[(
+                df['Banque_dépositaire'] == 'CACEIS') & 
+                (
+                (df['Email'] == "eric.belloche@groupe-aplitec.com") |
+                (df['Email'] == "akim.bouzeboudja@groupe-aplitec.com")
+                )]
 
     dotenv.load_dotenv(BASE_DIR / ".env")
 
@@ -39,21 +44,6 @@ def run_extract_pdf(dispo="01/04/2026", au="18/04/2026") -> None:
 
         login_page = Login(page)
 
-        # for row in caceis.itertuples(index=False):
-        #     print(f"\n🚀 Fund: {row.Société_de_gestion}")
-
-        #     page.goto(row.Adresse_internet)
-        #     login_page.login(row.Identifiant, row.Mot_de_passe)
-        #     login_page.otp_login(sender=row.Email)
-
-        #     select_page = Navigate_PDF_Caceis(page)
-
-        #     select_page.full_navigate(
-        #         fund_name=row.Société_de_gestion,
-        #         text="Extrait de compte cash",
-        #         dispo=dispo,
-        #         au=au,
-        #     )
         for row in caceis.itertuples(index=False):
         
             print(f"\n\n🚀 Starting navigation for fund: {row.Société_de_gestion}")
