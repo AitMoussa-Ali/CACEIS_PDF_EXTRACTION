@@ -34,7 +34,7 @@ def test_example(page: Page) -> None:
         fund_name=row.Société_de_gestion,
         text="Extrait de compte cash",
         dispo="01/04/2026",
-        au="18/04/2026",
+        au="04/05/2026",
         )
     
     

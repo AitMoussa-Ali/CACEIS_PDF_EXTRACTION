@@ -50,10 +50,10 @@ class Navigate_PDF_Caceis:
         self.menu_item.scroll_into_view_if_needed()
 
         # Step 4: move mouse to the item slowly using position
-        self.menu_item.hover(timeout=3000)
+        self.menu_item.hover()
 
         # Step 5: wait a bit for the submenu to fully expand
-        self.page.wait_for_timeout(500)
+        self.page.wait_for_timeout(1000)
 
         # Step 6: wait for the submenu link and click
         self.menu_rapport.wait_for(state="visible")
@@ -92,6 +92,7 @@ class Navigate_PDF_Caceis:
             # optional safety check (rarely needed)
             while not self.date_pattern.match(field.input_value()):
                 field.fill(value)
+                
             field.wait_for(timeout=2000)  # small delay to ensure selection
             field.press("Tab")
             
@@ -128,32 +129,26 @@ class Navigate_PDF_Caceis:
             rows = self.check_boxes.all()
             checkbox_rows = [r for r in rows if r.get_by_role("checkbox").count() > 0]
 
-            already_downloaded = set()
+            # already_downloaded = set()
 
             for row in checkbox_rows:
                 row_text = row.inner_text().strip()
-
                 # Extract fund code from row text to use as unique key
                 code_match = re.search(r'(\d{11})/\d{11}', row_text)
+                date_match = re.search(r'\d{2}/\d{2}/\d{4}', row_text)
                 if not code_match:
                     continue
-
                 fund_code = code_match.group(1)
-
-                # Skip if already downloaded
-                if fund_code in already_downloaded:
-                    print(f"⏭️ Skipping duplicate: {fund_code}")
-                    continue
-
-                already_downloaded.add(fund_code)
+                date_file = date_match.group(0)
 
                 # Build clean filename from row text
                 name_match = re.search(r'(\d{11}/\d{11}.*?)(?:\n|$)', row_text)
-                if not name_match:
-                    continue
+                # if not name_match:
+                #     continue
                 full_name = name_match.group(1).strip()
+                date_file = date_file.replace("/","-")
                 fund_code = full_name.split('/')[0]
-                file_name = full_name.replace("/", "-").replace("\\", "-").replace(":", "-").replace("*", "-").replace("?", "-").replace('"', "-").replace("<", "-").replace(">", "-").replace("|", "-").strip()
+                file_name = full_name.replace("/", "-").replace("\\", "-").replace(":", "-").replace("*", "-").replace("?", "-").replace('"', "-").replace("<", "-").replace(">", "-").replace("|", "-").strip()+" - "+date_file
 
                 # Uncheck all, then check only this row
                 for r in checkbox_rows:
