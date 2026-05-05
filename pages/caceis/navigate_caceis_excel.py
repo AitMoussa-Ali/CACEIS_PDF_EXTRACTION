@@ -37,21 +37,43 @@ class Navigate_Excel_Caceis :
         self.menu_item.scroll_into_view_if_needed()
         self.menu_item.hover()
     
+    def select_dates(self, du, au):
+        print("selecting dates.............................")
+        self.date_du = self.page.locator("iframe").content_frame.locator("[id=\"80000082-input\"]")
+        self.date_au = self.page.locator("iframe").content_frame.locator("[id=\"80000083-input\"]")
+        self.date_du.fill(du)
+        self.date_au.fill(au)
+        print("dates are selected successfully !")
+        
+    def select_language(self):
+        print("selecting language")
+        self.language = self.page.locator("iframe").content_frame.locator("#x-auto-80-input")
+        self.language.fill("Français")
+        print("language selected !")
+    
     def fill_informations(self):
         print("--------------waiting for information page to be charged--------------")
         self.information_page = self.page.locator("iframe").content_frame.locator("#x-auto-61-label")
         self.information_page.wait_for(state="visible")
         print("informations page charged successfully")
         
-        print("------------waiting for trigger----------")
-        self.input_selection_par = self.page.locator("iframe").content_frame.locator("#x-auto-65-input")
-        self.input_selection_par.click()
-        self.page.wait_for_timeout(300)
-        self.trigger1 = self.page.locator("iframe").content_frame.locator("#x-auto-65 .triggerfield-trigger")
-        self.trigger1.click()
-        print("the trigger is clicked !")
-        self.page.wait_for_timeout(10000)
-    
+        print("------------selecting compte cash----------")
+        frame = self.page.locator("iframe[src*='eventName=generation']").content_frame
+        self.trigger_selection_par = self.page.locator("iframe").content_frame.locator("#x-auto-65-input")
+        self.trigger_selection_par.fill("Compte cash")
+        print("------------compte cash selected------------")
+        
+        self.select_dates(du="01/04/2026", au="18/04/2026")
+        self.select_language()
+        
+        self.button_generation = self.page.locator("iframe").content_frame.get_by_role("button", name="Generate Dynamic Report")
+        
+        print("clicking on generation button")
+        # self.button_generation.click()
+        print("generation of excel file is done by clicking the button ...")
+        
+        self.page.wait_for_timeout(5000)
+
     def generation_phase(self):
         
         print("----------------------------------GENERATION PHASE----------------------------------")
@@ -88,12 +110,19 @@ class Navigate_Excel_Caceis :
         self.mes_rapports.wait_for(state="visible")
         self.mes_rapports.click()
         print("Returning to mes rapports has been done successfully")
+        
+        # self.rapports_excel = self.page.locator("iframe").content_frame.locator("div.PJOE2YC-E-e:has-text('Dernières recherches')")
+        frame = self.page.frame(url="*eventName=generation*")
+        elements = frame.get_by_text("Dernières recherches").all()
+        print(f"FOUND {len(elements)} elements")
+        # self.rapports_excel.wait_for(state="visible")
+        print("the page of excel reports is loaded successfully !")
     
     def full_navigate(self):
         # Step 1: Generation button
         self.generation_phase()
         self.mes_rapports_phase()
-        self.page.wait_for_timeout(10000)
+        self.page.wait_for_timeout(5000)
         
         
         
