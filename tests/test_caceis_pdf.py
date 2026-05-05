@@ -8,7 +8,7 @@ df = pd.read_excel(r"C:\Users\aaitmoussa\Desktop\Projet Aplitec\Automation\Login
 df.columns = df.columns.str.replace(' ', '_')
 
 caceis = df[df['Banque_dépositaire'] == 'CACEIS']
-caceis = caceis[caceis['Email'] == "eric.belloche@groupe-aplitec.com"]
+caceis = caceis[caceis['Email']]
 
 vars = dotenv.dotenv_values(r"C:\Users\aaitmoussa\Desktop\Projet Aplitec\Automation\.env")
 
