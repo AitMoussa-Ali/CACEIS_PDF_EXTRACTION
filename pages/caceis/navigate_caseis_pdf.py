@@ -72,8 +72,7 @@ class Navigate_PDF_Caceis:
         option = self.frame.get_by_text(periodicity)
         option.wait_for(state="visible")
         option.click()
-        
-        
+
 # Function to select dates with proper waiting and error handling 
     def select_dates(self, dispo, au):
         for field, value in [
@@ -89,13 +88,19 @@ class Navigate_PDF_Caceis:
             field.wait_for(timeout=2000)  # small delay to ensure selection
             field.press("Backspace")
             field.wait_for(timeout=2000)  # small delay to ensure selection
+            
             # optional safety check (rarely needed)
             while not self.date_pattern.match(field.input_value()):
+                field.fill(value)
+            
+            while field.input_value() != value :
+                print("the value is not matched retrying ... ")
                 field.fill(value)
                 
             field.wait_for(timeout=2000)  # small delay to ensure selection
             field.press("Tab")
-            
+
+        print("dates are selected successfully !")
             
 # Function to select all checkboxes in the results table
     def select_all_checkboxes(self):
@@ -139,7 +144,7 @@ class Navigate_PDF_Caceis:
                 if not code_match:
                     continue
                 fund_code = code_match.group(1)
-                date_file = date_match.group(0)
+                date_file = date_match.group(0) 
 
                 # Build clean filename from row text
                 name_match = re.search(r'(\d{11}/\d{11}.*?)(?:\n|$)', row_text)
@@ -189,3 +194,4 @@ class Navigate_PDF_Caceis:
         print("Waiting for results...")
         self.wait_for_results(dispo=dispo, au=au, fund_name=fund_name)
         self.logout_user()
+

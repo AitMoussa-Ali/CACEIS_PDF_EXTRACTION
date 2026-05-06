@@ -18,18 +18,18 @@ def test_example(page: Page) -> None:
     
     for row in caceis.itertuples(index=False):
         
-        print(f"\n\n🚀 Starting navigation for fund: {row.Société_de_gestion}")
+        print(f"\n\n🚀 Starting navigation for fund: {"Aldebaran"}")
 
         page.goto(row.Adresse_internet)
-        login_page.login(row.Identifiant, row.Mot_de_passe)
+        login_page.login("11066/abouzeboudja", "Aplitec*1-26?!")
 
         # Wait for OTP field to appear for the double authentication step
-        login_page.otp_login(sender=row.Email)
+        login_page.otp_login(sender="akim.bouzeboudja@groupe-aplitec.com")
 
         # Selection of menu
         select_page = Navigate_Excel_Caceis(page)
 
-        select_page.full_navigate()
+        select_page.full_navigate(dispo="01/04/2026",au = "04/05/2026", fund_name="Aldebaran")
     
     
     
