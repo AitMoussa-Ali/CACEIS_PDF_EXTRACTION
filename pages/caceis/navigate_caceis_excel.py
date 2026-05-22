@@ -26,6 +26,8 @@ class Navigate_Excel_Caceis :
         # Non-iframe helpers
         self.date_pattern = re.compile(r"^\d{2}/\d{2}/\d{4}$")
         
+        self.logout = page.locator("li:nth-child(7) > .p-element")
+        
     def loading_spin_reports(self):
         self.loading = (
         self.page.locator("iframe[src*='eventName=myreports']")
@@ -54,7 +56,6 @@ class Navigate_Excel_Caceis :
         self.loading.wait_for(state="hidden", timeout=60000)
         print("loading finished ....")
         
-            
     def select_menu(self):
         # Step 1: click to open the menu
         self.menu.click(delay=30)
@@ -98,8 +99,8 @@ class Navigate_Excel_Caceis :
         self.button_generation = self.page.locator("iframe").content_frame.get_by_role("button", name="Generate Dynamic Report")
         
         print("clicking on generation button")
-        # self.button_generation.click()
-        # self.loading_spin_generation()
+        self.button_generation.click()
+        self.loading_spin_generation()
         print("generation of excel file is done by clicking the button ...")
         self.generation_time = datetime.now()
         
@@ -150,30 +151,30 @@ class Navigate_Excel_Caceis :
                 self.loading_spin_reports()
                 
                 if(self.elements.is_visible() == True):
-                    flag = True
-                #     self.time_generation_file = (
-                #     self.page.locator("iframe[src*='eventName=myreports']")
-                #     .first
-                #     .content_frame
-                #     .locator("td:nth-child(9) > .grid-cellinner > .cellContainer").first.inner_text()
-                #     )
+                    # flag = True
+                    self.time_generation_file = (
+                    self.page.locator("iframe[src*='eventName=myreports']")
+                    .first
+                    .content_frame
+                    .locator("td:nth-child(9) > .grid-cellinner > .cellContainer").first.inner_text()
+                    )
                     
-                #     self.time_generation_file = self.parse_date(self.time_generation_file)
+                    self.time_generation_file = self.parse_date(self.time_generation_file)
 
-                #     print(f"-----------------generation file time : {self.time_generation_file}------------------")
-                #     print(f"-----------------generation script time : {self.generation_time}------------------")
+                    print(f"-----------------generation file time : {self.time_generation_file}------------------")
+                    print(f"-----------------generation script time : {self.generation_time}------------------")
                     
-                #     print(f"the difference is {abs((self.time_generation_file - self.generation_time).total_seconds())}")
+                    print(f"the difference is {abs((self.time_generation_file - self.generation_time).total_seconds())}")
                     
-                #     if( abs((self.time_generation_file - self.generation_time).total_seconds()) < 60 ):
-                #         print("file found !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-                #         flag=True
-                #         break
+                    if( abs((self.time_generation_file - self.generation_time).total_seconds()) < 90 ):
+                        print("file found !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                        flag=True
+                        break
                     
                     
-                # print("no results, clicking on the search button after 5 seconds")
-                else : 
-                    print("no results, clicking on the search button after 5 seconds")
+                print("no results, clicking on the search button after 5 seconds")
+                # else : 
+                #     print("no results, clicking on the search button after 5 seconds")
                     
                 time.sleep(5)
                 self.search_button.click()
@@ -234,11 +235,18 @@ class Navigate_Excel_Caceis :
         # Wait for loading to appear (it might be brief, so use a short timeout)
         self.download_excel_file(dispo, au, fund_name=fund_name)
         
+    def logout_user(self):
+        self.logout.wait_for(state="visible")
+        self.logout.click()
+    
     def full_navigate(self, dispo, au, fund_name):
         # Step 1: Generation button
         self.generation_phase(dispo=dispo, au=au)
         self.mes_rapports_phase(dispo=dispo, au=au, fund_name=fund_name)
         self.page.wait_for_timeout(5000)
+        print("loging out ....")
+        self.logout_user()
+        print("loging out has been done successfully ....")
         
         
         
