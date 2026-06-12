@@ -1,9 +1,8 @@
-from dataclasses import field
 
 from playwright.sync_api import Page, TimeoutError as PlaywrightTimeout
-import time
-from Sharepoint_handeling.uploader import upload_single_pdf_to_sharepoint
+from Sharepoint_handeling.uploader import upload_single_pdf_to_sharepoint, upload_single_excel_to_sharepoint
 import re
+from playwright.sync_api import  TimeoutError as PlaywrightTimeoutError
 
 class Navigate_PDF_Caceis:
     def __init__(self, page: Page):
@@ -112,6 +111,8 @@ class Navigate_PDF_Caceis:
 # Function to wait for either results or error, then act accordingly
     
     def wait_for_results(self, dispo: str, au: str, fund_name: str):
+        data_excel = []
+        funds = []
         while self.table.is_visible() == False and self.error.is_visible() == False:
             print("Waiting for results or error...")
             self.page.wait_for_timeout(1000)
@@ -143,16 +144,18 @@ class Navigate_PDF_Caceis:
                 date_match = re.search(r'\d{2}/\d{2}/\d{4}', row_text)
                 if not code_match:
                     continue
-                fund_code = code_match.group(1)
+                # fund_code = code_match.group(1)
                 date_file = date_match.group(0) 
 
                 # Build clean filename from row text
                 name_match = re.search(r'(\d{11}/\d{11}.*?)(?:\n|$)', row_text)
-                # if not name_match:
-                #     continue
-                full_name = name_match.group(1).strip()
+                file_match = re.search(r'\d{11}/\d{11}\s*(.*)', row_text)
+
+                full_name = name_match.group(1).strip() if name_match else "file"
+                fund = file_match.group(1).strip() if file_match else "fund"
+                funds.append(fund)
                 date_file = date_file.replace("/","-")
-                fund_code = full_name.split('/')[0]
+                # fund_code = full_name.split('/')[0]
                 file_name = full_name.replace("/", "-").replace("\\", "-").replace(":", "-").replace("*", "-").replace("?", "-").replace('"', "-").replace("<", "-").replace(">", "-").replace("|", "-").strip()+" - "+date_file
 
                 # Uncheck all, then check only this row
@@ -161,23 +164,27 @@ class Navigate_PDF_Caceis:
                     if cb.count() > 0 and cb.is_checked():
                         cb.uncheck()
 
-                row.get_by_role("checkbox").check()
+                # row.get_by_role("checkbox").check()
+                row.get_by_role("checkbox").dispatch_event("click")
+
 
                 print(f"⬇️ Downloading: {file_name}")
-                with self.page.expect_download(timeout=0) as download_info:
-                    self.download.click()
-
-                download = download_info.value
-                temp_path = download.path()
-
-                upload_single_pdf_to_sharepoint(temp_path, fund_name, dispo, au, file_name)
+                try:
+                    with self.page.expect_download(timeout=8000) as download_info:
+                        self.download.click()
+                    download = download_info.value
+                    temp_path = download.path()
+                    content = upload_single_pdf_to_sharepoint(temp_path, fund_name, dispo, au, file_name)
+                    data_excel.append(content)
+                except PlaywrightTimeoutError:
+                    print(f"⚠️ Download timed out for {file_name}, skipping...")
 
             if i < number_of_pages:
                 self.next_button.click()
                 self.table.wait_for(state="visible", timeout=0) 
 
         print("\n >>>>> Download done !!")
-        return True
+        return data_excel, funds
     
     def logout_user(self):
         self.logout.wait_for(state="visible")
@@ -185,13 +192,21 @@ class Navigate_PDF_Caceis:
 
 #------------------------------------------------------------------------------------------
 # Main function to perform the full navigation flow
-    def full_navigate(self, text, dispo, au, fund_name):
+    def full_navigate(self, text, dispo, au, fund_name, management_company):
         self.select_menu()
         self.select_type_document(text)
         self.select_dates(dispo, au)
         self.select_periodicity()
         self.rechercher.click()
         print("Waiting for results...")
-        self.wait_for_results(dispo=dispo, au=au, fund_name=fund_name)
-        self.logout_user()
+        try : 
+            excel_data, funds = self.wait_for_results(dispo=dispo, au=au, fund_name=fund_name)
+            upload_single_excel_to_sharepoint(management_company=management_company, excel_data=excel_data, funds = funds)
+            self.logout_user()
+            return True
+        except PlaywrightTimeoutError:
+            self.logout_user()
+            return fund_name
+            
+            
 

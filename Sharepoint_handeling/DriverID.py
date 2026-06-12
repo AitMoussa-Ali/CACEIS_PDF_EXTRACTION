@@ -1,11 +1,12 @@
 import dotenv
 import requests
-vars = dotenv.dotenv_values(r"C:\Users\aaitmoussa\Desktop\Projet Aplitec\Automation\.env")
+from utils.Config import Config
+# vars = dotenv.dotenv_values(r"C:\Users\aaitmoussa\Desktop\Projet Aplitec\Automation\.env")
 import os
 def get_drive_id(token: str) -> str:
     headers = {"Authorization": f"Bearer {token}"}
     
-    site_url = vars["SHAREPOINT_SITE_URL"]
+    site_url = Config.SHAREPOINT_SITE_URL
 
     site_response = requests.get(
         f"https://graph.microsoft.com/v1.0/sites/{site_url}",

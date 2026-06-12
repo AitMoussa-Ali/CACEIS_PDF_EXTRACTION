@@ -1,0 +1,71 @@
+{
+  "BNP": {
+    "Bank_name": ["BNP PARIBAS"], 
+    "type":"text",
+    "columns": { 
+      "date": [0, 1],
+      "label": [2, 3],
+      "debit": 4,
+      "credit": 5
+    },
+    "FIELD_LABELS" : [
+    "Solde au",
+    "Date comptable",
+    "Valeur",
+    "Code SWIFT",
+    "Montant",
+    "Libellé mouvement",
+    "Référence client",
+    "Référence banque",
+    "Code opération"
+    ],
+    "Debut_block" : "Date comptable"
+  },
+
+  "SocieteGenerale": {
+    "Bank_name":["SOCIETE GENERALE"],
+    "type": "table",
+    "columns":{
+        "Date": 0,
+        "Compte": null,
+        "Libellé":{
+          "index": 1,
+          "keywords" : ["Période d'arrêté", "Intérêts créditeurs"]
+        },
+        "Débit":2,
+        "Crédit":3, 
+        "Date_valeur":-1
+    }
+  },
+
+  "Caceis": {
+    "Bank_name":["caceis"],
+    "type": "table",
+    "columns":{
+        "Date": 0,
+        "Compte": null,
+        "Libellé":{
+          "index": 1,
+          "keywords" : ["Période d'arrêté", "Intérêts créditeurs"]
+        },
+        "Débit":3,
+        "Crédit":4, 
+        "Date_valeur":2
+    }
+  },
+
+  "oddo": {
+    "Bank_name":["oddo"],
+    "type": "joining tables",
+    "columns":{
+        "Date": 0,
+        "Compte": null,
+        "Libellé":{
+          "index": 2,
+          "keywords" : ["Période d'arrêté", "Intérêts créditeurs"]
+        },
+        "Débit":-1,
+        "Date_valeur" : 1
+    }
+  }
+}

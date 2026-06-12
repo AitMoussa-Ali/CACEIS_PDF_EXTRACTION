@@ -1,13 +1,23 @@
-import os 
+import os
 
 from app.pdf.run_pdf import run_extract_pdf
 from app.excel.run_excel import run_excel
-task = os.getenv("TASK", "default_task")
-de = os.getenv("DE", "default_de")
-au = os.getenv("AU", "default_au")
+from datetime import datetime, timedelta
 
-if task == "pdf":
-    run_extract_pdf(dispo=de, au=au)
 
-if task == "excel":
-    run_excel()
+
+
+def get_week_dates():
+    today = datetime.today()
+
+    # Previous Saturday
+    last_saturday = today - timedelta(days=31)
+
+    de = last_saturday.strftime("%d/%m/%Y")
+    au = today.strftime("%d/%m/%Y")
+
+    return de, au
+
+
+de, au = get_week_dates()
+run_extract_pdf(dispo=de, au=au)

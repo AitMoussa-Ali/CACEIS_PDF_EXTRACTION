@@ -1,5 +1,6 @@
 import pytest
 from playwright.sync_api import sync_playwright
+from datetime import datetime
 
 @pytest.fixture(scope="session")
 def browser():
@@ -11,7 +12,12 @@ def browser():
                 "--disable-features=Translate"
             ]
             )
+        context = browser.new_context(
+        record_video_dir=f"videos/{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}/",
+        record_video_size={"width": 1280, "height": 720}
+    )
         yield browser
+        context.close()
         browser.close()
 
 @pytest.fixture

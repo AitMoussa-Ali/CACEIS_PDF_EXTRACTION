@@ -4,9 +4,10 @@ from Sharepoint_handeling.DriverID import get_drive_id
 from Sharepoint_handeling.uploader import create_folder, upload_file_to_folder
 import dotenv
 import io
+from utils.Config import Config
 
 df = pd.read_excel(r"C:\Users\aaitmoussa\Desktop\Excel_files\Mouvements_cash.xlsx")
-vars = dotenv.dotenv_values(r"C:\Users\aaitmoussa\Desktop\Projet Aplitec\Automation\.env")
+# vars = dotenv.dotenv_values(r"C:\Users\aaitmoussa\Desktop\Projet Aplitec\Automation\.env")
 
 def clear_data(df : pd.DataFrame):
     df = df[["Libellé compte cash","Devise compte","Date comptable","Montant mouvement (devise compte)","Description mouvement", "Libellé compte cash"]]
@@ -56,7 +57,7 @@ def upload_single_excel_to_sharepoint(excel_path, fund_name: str, dispo: str, au
 
     safe_fund_name = fund_name.replace("/", "-").replace("\\", "-").replace(":", "-").replace("*", "-").replace("?", "-").replace('"', "-").replace("<", "-").replace(">", "-").replace("|", "-").strip()
     subfolder_name = f"{safe_fund_name}-{dispo.replace('/', '-')}_{au.replace('/', '-')}"
-    parent_folder = vars["SHAREPOINT_FOLDER_EXCEL"]
+    parent_folder = Config.SHAREPOINT_FOLDER_EXCEL
     full_folder_path = f"{parent_folder}/{subfolder_name}"
 
     create_folder(token, drive_id, parent_folder, subfolder_name)

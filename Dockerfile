@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright/python:v1.49.0
+FROM mcr.microsoft.com/playwright/python:v1.58.0-noble
 
 WORKDIR /app
 
@@ -7,6 +7,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN playwright install --with-deps
-
-CMD ["python", "-m", "app.main"]
+CMD ["python", "-u", "-m", "app.main"]

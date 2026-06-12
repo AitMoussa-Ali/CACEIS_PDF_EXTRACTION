@@ -1,16 +1,17 @@
 import msal
 import dotenv
 import os
-vars = dotenv.dotenv_values(r"C:\Users\aaitmoussa\Desktop\Projet Aplitec\Automation\.env")
+from utils.Config import Config
+# vars = dotenv.dotenv_values(r"C:\Users\aaitmoussa\Desktop\Projet Aplitec\Automation\.env")
 
 def get_token() -> str | None:
     app = msal.ConfidentialClientApplication(
-        client_id=vars["CLIENT_ID"],
-        client_credential=vars["PASSWORD_MAILBOX"],
-        authority=f"https://login.microsoftonline.com/{vars['TENANT_ID']}"
+        client_id=Config.CLIENT_ID,
+        client_credential=Config.PASSWORD_MAILBOX,
+        authority=f"https://login.microsoftonline.com/{Config.TENANT_ID}"
     )
     result = app.acquire_token_for_client(
-        scopes=[vars["SCOPES"]]
+        scopes=[Config.SCOPES]
     )
     if "access_token" in result:
         print("✅ Token OK")
