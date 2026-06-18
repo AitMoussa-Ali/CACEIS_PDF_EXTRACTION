@@ -110,7 +110,7 @@ class Navigate_PDF_Caceis:
 
 # Function to wait for either results or error, then act accordingly
     
-    def wait_for_results(self, dispo: str, au: str, fund_name: str):
+    def wait_for_results(self, dispo: str, au: str, fund_name: str, periodicity : str):
         data_excel = []
         funds = []
         while self.table.is_visible() == False and self.error.is_visible() == False:
@@ -119,7 +119,7 @@ class Navigate_PDF_Caceis:
 
         if self.error.is_visible():
             print("No document found.")
-            return False
+            return [], []  # instead of False
         else:
             print("Documents found, processing downloads...")
 
@@ -174,7 +174,7 @@ class Navigate_PDF_Caceis:
                         self.download.click()
                     download = download_info.value
                     temp_path = download.path()
-                    content = upload_single_pdf_to_sharepoint(temp_path, fund_name, dispo, au, file_name)
+                    content = upload_single_pdf_to_sharepoint(temp_path, fund_name, dispo, au, file_name, periodicity)
                     data_excel.append(content)
                 except PlaywrightTimeoutError:
                     print(f"⚠️ Download timed out for {file_name}, skipping...")
@@ -192,18 +192,19 @@ class Navigate_PDF_Caceis:
 
 #------------------------------------------------------------------------------------------
 # Main function to perform the full navigation flow
-    def full_navigate(self, text, dispo, au, fund_name, management_company):
+    def full_navigate(self, text, dispo, au, fund_name, management_company, periodicity = "MEN : Mensuelle"):
         self.select_menu()
         self.select_type_document(text)
         self.select_dates(dispo, au)
-        self.select_periodicity()
+        self.select_periodicity(periodicity=periodicity)
         self.rechercher.click()
         print("Waiting for results...")
         try : 
-            excel_data, funds = self.wait_for_results(dispo=dispo, au=au, fund_name=fund_name)
-            upload_single_excel_to_sharepoint(management_company=management_company, excel_data=excel_data, funds = funds)
-            self.logout_user()
-            return True
+            excel_data, funds = self.wait_for_results(dispo=dispo, au=au, fund_name=fund_name, periodicity=periodicity)
+            if excel_data != [] and funds !=[]: 
+                upload_single_excel_to_sharepoint(management_company=management_company, excel_data=excel_data, funds = funds, periodicity=periodicity)
+                self.logout_user()
+                return True
         except PlaywrightTimeoutError:
             self.logout_user()
             return fund_name

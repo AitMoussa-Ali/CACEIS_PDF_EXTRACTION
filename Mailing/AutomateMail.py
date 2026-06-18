@@ -81,7 +81,8 @@ def fetch_otp_from_outlook(
 
         time.sleep(poll_interval)
 
-    raise TimeoutError("OTP not received within timeout period")
+    # raise TimeoutError("OTP not received within timeout period")
+    return False
 
 def send_email(subject: str, body: str, recipients: list[str]) -> bool:
     token = get_token()

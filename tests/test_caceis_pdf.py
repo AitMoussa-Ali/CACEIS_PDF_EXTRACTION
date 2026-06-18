@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-
 from Sharepoint_handeling.Delete_files import delete_files
 from playwright.sync_api import Page
 import dotenv
@@ -11,37 +10,57 @@ import time
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 from Mailing.AutomateMail import send_email
 from utils.Logger import logger
+import calendar
+from utils.Config import Config
+
 societes_de_gestion_mdp_errors = []
 societes_de_gestion_refresh_pwd = []
 
+def is_last_day_of_month() -> bool:
+    today = datetime.today()
+    last_day = calendar.monthrange(today.year, today.month)[1]
+    return last_day == today
+
+def get_periodicity() -> str:
+    return "MEN : Mensuelle" if is_last_day_of_month() else "QUO : Quotidienne"
+
 def get_week_dates():
     today = datetime.today()
+    print(get_periodicity())
+    
+    if (get_periodicity() == "QUO : Quotidienne"):
+        # Previous Saturday
+        last_saturday = today - timedelta(days=7)
 
-    # Previous Saturday
-    last_saturday = today - timedelta(days=31)
+        de = last_saturday.strftime("%d/%m/%Y")
+        au = today.strftime("%d/%m/%Y")
 
-    de = last_saturday.strftime("%d/%m/%Y")
-    au = today.strftime("%d/%m/%Y")
-
+    else:
+        de = today.replace(day=1).strftime("%d/%m/%Y")
+        last_day_num = calendar.monthrange(today.year, today.month)[1]
+        au = today.replace(day=last_day_num).strftime("%d/%m/%Y")
+    
     return de, au
 
 
 def test_example(page: Page) -> None:
     de,au = get_week_dates()
+    periodicity = get_periodicity()
+    
+    if periodicity == "MEN : Mensuelle" : 
+        print("Execution en mensuelle ...")
+    else : 
+        print("Execution en Quotidienne")
+        
     print(f"📅 Running test for date range: {de} to {au}")
     df = read_excel_from_sharepoint()
     if df is None:
         logger.error("Failed to load Excel file")
         raise RuntimeError("Failed to load Excel from SharePoint")
-    # df = pd.read_excel(r"C:\Users\aaitmoussa\Desktop\Projet Aplitec\Automation\Login_list_for_funds.xlsx", skiprows=1)
-    # df.columns = df.columns.str.replace(' ', '_')
-    # df = df.where(pd.notnull(df), None)
-    caceis = df[(df['Banque_dépositaire'] == 'CACEIS')]
+
+    caceis = df[(df['Banque_dépositaire'] == 'CACEIS') & (df["Société_de_gestion"] == "Inco Venture (Sycomore Impact Emploi by INCO - SIEBI)")]
     
-    #Deleting the files in the download folder before downloading new ones
-                # This is to avoid having multiple files in the download folder and to make sure that we
-    # print("deleting files..........")
-    # delete_files()
+
     
     # Loop through the rows of the dataframe and navigate to the website, login and download the pdfs
     login_page = Login(page)
@@ -78,10 +97,15 @@ def test_example(page: Page) -> None:
                 
                 try :
                     # Wait for OTP field to appear for the double authentication step
-                    flag_pwd = login_page.otp_login(sender=row.Email, timeout=1200)
+                    flag_pwd, msg = login_page.otp_login(sender=row.Email, timeout=1200)
+                    
                     if flag_pwd == False : 
-                        societes_de_gestion_refresh_pwd.append(row.Société_de_gestion)
-                        flag = False
+                        if msg == "Password" :
+                            societes_de_gestion_refresh_pwd.append(row.Société_de_gestion)
+                            flag = False
+                        elif msg == "OTP" :
+                            print("Code OTP Non recu pour le fond",row.Société_de_gestion)
+                    
                     else :
                         # Selection of menu
                         select_page = Navigate_PDF_Caceis(page)
@@ -91,7 +115,8 @@ def test_example(page: Page) -> None:
                         text="Extrait de compte cash",
                         dispo=de,
                         au=au,
-                        management_company=row.Société_de_gestion
+                        management_company=row.Société_de_gestion,
+                        periodicity=periodicity
                         )
                         if result == row.Société_de_gestion :
                             print(f"Erreur de telechargement des fichiers PDF depuis le site d'OLIS pour la societe {row.Société_de_gestion}")
@@ -139,7 +164,7 @@ def test_example(page: Page) -> None:
         send_email(
             "IMPORTANT : Mots de passe erroné", 
             f"Bonjour, les mots de passes de ses sociétés de gestion sont erroné : \n {text} \n Merci de bien vouloir les mettre a jour",
-            ["ali.aitmoussa@groupe-aplitec.com"]
+            [Config.MAIL_SENDER]
             )
     
     

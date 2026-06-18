@@ -49,9 +49,9 @@ class Login:
             
             otp = fetch_otp_from_outlook(sender=sender, timeout=timeout)
             
-            if not otp:
+            if otp == False:
                 print("❌ Failed to retrieve OTP. Please check the mailbox and try again.")
-                return
+                return False, "OTP"
             
             print('>>> OTP received:', otp)
             self.otp_input.type(otp)
@@ -68,11 +68,11 @@ class Login:
                 
             elif self.confirmer_mdp.is_visible() : 
                 print("Password needs to be changed")
-                return False
+                return False, "Password"
             else: 
                 logged_in = True
                 print("✅ Logged in successfully!")
                 
-        return True
+        return True, "Success"
     
     

@@ -63,15 +63,17 @@ def upload_file_to_folder(token: str, drive_id: str, folder_path: str, filename:
         raise Exception(f"Failed to upload {filename}: {response.json()}")
 
 #eturning content
-def upload_single_pdf_to_sharepoint(pdf_path, fund_name: str, dispo: str, au: str, file_name: str):
+def upload_single_pdf_to_sharepoint(pdf_path, fund_name: str, dispo: str, au: str, file_name: str, periodicity):
     token = get_token()
     drive_id = get_drive_id(token)
 
     safe_fund_name = fund_name.replace("/", "-").replace("\\", "-").replace(":", "-").replace("*", "-").replace("?", "-").replace('"', "-").replace("<", "-").replace(">", "-").replace("|", "-").strip()
     subfolder_name = f"{safe_fund_name}-{dispo.replace('/', '-')}_{au.replace('/', '-')}"
     
-    parent_folder_pdf = Config.SHAREPOINT_FOLDER
-    parent_folder_excel = Config.SHAREPOINT_FOLDER_EXCEL
+    if periodicity == "MEN : Mensuelle": 
+        parent_folder_pdf = Config.SHAREPOINT_FOLDER_PDF_MENSUELLE
+    else:
+        parent_folder_pdf = Config.SHAREPOINT_FOLDER_PDF_QUOTIDIEN
     
     full_folder_path_pdf = f"{parent_folder_pdf}/{subfolder_name}"
     # full_folder_path_excel = f"{parent_folder_excel}/{subfolder_name}"
@@ -86,19 +88,19 @@ def upload_single_pdf_to_sharepoint(pdf_path, fund_name: str, dispo: str, au: st
     except Exception as e:
         print(f"Failed to upload PDF: {file_name}.pdf. Error: {str(e)}")
         
-    # Excel file
     return content
-    # try:
-    #     excel_content = generate_excel_content_from_pdf(content, "Caceis")
-    #     upload_file_to_folder(token, drive_id, full_folder_path_excel, file_name + ".xlsx", excel_content)
-    # except Exception as e:
-    #     print(f"Failed to upload Excel: {file_name}.xlsx. Error: {str(e)}")
 
-def upload_single_excel_to_sharepoint(management_company: str, excel_data, funds):
+
+def upload_single_excel_to_sharepoint(management_company: str, excel_data, funds, periodicity):
     token = get_token()
     drive_id = get_drive_id(token)
     safe_management_name = management_company.replace("/", "-").replace("\\", "-").replace(":", "-").replace("*", "-").replace("?", "-").replace('"', "-").replace("<", "-").replace(">", "-").replace("|", "-").strip()
-    parent_folder_excel = Config.SHAREPOINT_FOLDER_EXCEL
+    
+    if periodicity == "MEN : Mensuelle": 
+        parent_folder_excel = Config.SHAREPOINT_FOLDER_EXCEL_MENSUELLE
+    else:
+        parent_folder_excel = Config.SHAREPOINT_FOLDER_EXCEL_QUOTIDIEN
+    
     full_folder_path_excel = f"{parent_folder_excel}/{safe_management_name}"
     file_name = management_company
     create_folder(token, drive_id, parent_folder_excel, safe_management_name)

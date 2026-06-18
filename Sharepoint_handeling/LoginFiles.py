@@ -58,3 +58,4 @@ def read_excel_from_sharepoint() -> pd.DataFrame:
     except Exception as e:
         print(f"Error reading file: {e}")
         return None
+    

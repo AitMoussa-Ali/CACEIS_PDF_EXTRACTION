@@ -1,0 +1,41 @@
+- type: cron
+  name: caceis-extract
+  runtime: docker
+  schedule: "0 17 * * *"
+  dockerfilePath: ./Dockerfile
+  envVars:
+    - key: PLAYWRIGHT_BROWSERS_PATH
+      value: /ms-playwright
+    - key: CLIENT_ID
+      sync: false
+    - key: CLIENT_SECRET
+      sync: false
+    - key: TENANT_ID
+      sync: false
+    - key: SHARED_MAILBOX
+      sync: false
+    - key: SCOPES
+      sync: false
+    - key: PASSWORD_MAILBOX
+      sync: false
+    - key: URL_SHARE_POINT
+      sync: false
+    - key: SHAREPOINT_FOLDER_PDF_MENSUELLE
+      sync: false
+    - key: SHAREPOINT_FOLDER_PDF_QUOTIDIEN
+      sync: false
+    - key: SHAREPOINT_FOLDER_EXCEL_MENSUELLE
+      sync: false
+    - key: SHAREPOINT_FOLDER_EXCEL_QUOTIDIEN
+      sync: false
+    - key: SHAREPOINT_SITE_URL
+      sync: false
+    - key: PATH_LOGIN_FILE
+      sync: false
+    - key: SHEET_LOGIN_NAME
+      sync: false
+    - key: LOCAL_PATH_LOGIN_FILE_SHEET
+      sync: false
+    - key: SENDER
+      sync: false
+    
